@@ -63,13 +63,17 @@ syscall pipesend(
 		restore(mask);
 		return SYSERR;
 	}
-
+	kprintf("length: %d\n", len);
 	wait(pipetab[pipe].sem_id);
 	for (int i = 0; i < len; i++) {
-		pipetab[pipe].buffer[i] = c[i];
+		int cur = pipetab[pipe].curr_len;
+		pipetab[pipe].buffer[cur] = c[i];
+		pipetab[pipe].curr_len++;
 	}
+	kprintf("curr len: %d\n", pipetab[pipe].curr_len);
+	
 	//strcpy(pipetab[pipe].buffer, c);
-	pipetab[pipe].curr_len += len;	
+	//pipetab[pipe].curr_len += len;	
 	signal(pipetab[pipe].sem_id);
 
 	restore(mask);

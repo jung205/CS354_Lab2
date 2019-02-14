@@ -13,6 +13,7 @@ process	main(void)
 	
 	pipesend(three, 6, "himanz");
 	pipesend(one, 6, "supman");
+	pipesend(three, 4, " ima");
 
 	//pipeclose(0);
 
