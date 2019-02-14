@@ -13,6 +13,7 @@ int32 pipeopen(void) {
 			pipetab[i].pipe_status = PIPE_USED;
 			strcpy(pipetab[i].buffer, "");
 			pipetab[i].curr_len = 0;
+			pipetab[i].read_pos = 0;
 			// Access semaphore; semtab[i]
 			pipetab[i].sem_id = semcreate(1);
 			return i;
@@ -40,6 +41,7 @@ syscall pipeclose(
 	pipetab[pipe].pipe_status = PIPE_AVAL;
 	strcpy(pipetab[pipe].buffer, "");	/* Discard buffer */
 	pipetab[pipe].curr_len = 0;
+	pipetab[pipe].read_pos = 0;
 	semdelete(pipetab[pipe].sem_id);
 
 	restore(mask);
@@ -63,20 +65,21 @@ syscall pipesend(
 		restore(mask);
 		return SYSERR;
 	}
-	kprintf("length: %d\n", len);
-	wait(pipetab[pipe].sem_id);
+	//kprintf("length: %d\n", len);
 	for (int i = 0; i < len; i++) {
+		//wait(pipetab[pipe].sem_id);
+	
 		int cur = pipetab[pipe].curr_len;
 		pipetab[pipe].buffer[cur] = c[i];
 		pipetab[pipe].curr_len++;
+	
+		//signal(pipetab[pipe].sem_id);
 	}
-	kprintf("curr len: %d\n", pipetab[pipe].curr_len);
+	//kprintf("curr len: %d\n", pipetab[pipe].curr_len);
 	
 	//strcpy(pipetab[pipe].buffer, c);
 	//pipetab[pipe].curr_len += len;	
-	signal(pipetab[pipe].sem_id);
-
-	restore(mask);
+		restore(mask);
 	return OK;
 }
 
@@ -98,11 +101,17 @@ syscall piperecv(
 		return SYSERR;
 	}
 
+	wait(pipetab[pipe].sem_id);
 	for (int i = 0; i < len; i++) {
-		c[i] = pipetab[pipe].buffer[i];
+		int cur = pipetab[pipe].read_pos;
+		//kprintf("RECEIVE: %d: %c\n", pipetab[pipe].read_pos, pipetab[pipe].buffer[cur]);
+		c[i] = pipetab[pipe].buffer[cur];
+		pipetab[pipe].read_pos++;
 	}
+	c[len] = '\0';
 	//strcpy(c, pipetab[pipe].buffer);
-	
+	signal(pipetab[pipe].sem_id);	
+
 	restore(mask);
 	return OK;
 }

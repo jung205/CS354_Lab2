@@ -6,6 +6,7 @@ struct pipeent {
   char buffer[PIPE_BS];
   uint16 pipe_status;
   int32 curr_len;
+  int32 read_pos;
   sid32 sem_id;
 };
 

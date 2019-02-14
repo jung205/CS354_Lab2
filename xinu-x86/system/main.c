@@ -20,7 +20,11 @@ process	main(void)
 	char msg[3];
 	piperecv(three, 3, msg);
 	kprintf(msg);
-	kprintf("\n");
+
+	char msgTwo[5];
+	piperecv(three, 5, msgTwo);
+	kprintf("%s\n", msgTwo);
+	kprintf("end receiving\n");
 
 	pipeprint();
 
