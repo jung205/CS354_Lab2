@@ -23,7 +23,11 @@ process	main(void)
 
 	char msgTwo[5];
 	piperecv(three, 5, msgTwo);
-	kprintf("%s\n", msgTwo);
+	kprintf("%s", msgTwo);
+	
+	char msgThree[2];
+	piperecv(three, 2, msgThree);
+	kprintf("%s\n", msgThree);
 	kprintf("end receiving\n");
 
 	pipeprint();
@@ -36,6 +40,25 @@ process	main(void)
 	pipeclose(0);
 	pipeclose(1);
 	pipeclose(2);
+
+	/* TESTING SEMAPHORES */
+	kprintf("TESTING SEMAHPORES!!!!!!!\n");
+
+	int32 four = pipeopen();
+	
+	char testes[] = "syscall piperecv(int32 pipe, int32 len, char *c) takes a pipe id, a message length, and a char pointer as arguments. It should put len characters from the buffer of the specified pipe to c, and return OK. If there is not enough characters in the buffer, it should put all them";
+	kprintf("%s\n", testes);
+	pipesend(four, 276, testes);
+
+	char testMsg[20];
+	piperecv(four, 20, testMsg);
+	kprintf("%s", testMsg);	
+
+	char testMsgTwo[256];
+	piperecv(four, 256, testMsgTwo);
+	kprintf("%s", testMsgTwo);
+
+	kprintf("\n");
 
 	return OK;
 }
